@@ -28,7 +28,9 @@ router.get("/users",(req, res)=>{
 })
 
 router.get("/users/me", auth, async (req, res)=>{
-    res.send(req.user)
+    await req.user.populate('tasks').execPopulate()
+    const tasks = req.user.tasks
+    res.send({"user": req.user,"tasks": tasks })
 })
 
 router.get("/users/:id", auth, (req, res)=>{
