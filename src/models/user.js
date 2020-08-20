@@ -29,6 +29,9 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     }],
+    avatar: {
+        type: Buffer
+    },
     age: {
         type: Number,
         validate(value){

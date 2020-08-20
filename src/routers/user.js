@@ -107,12 +107,12 @@ router.post("/users/logoutAll", auth, async (req, res)=>{
 })
 
 const upload = multer({
-    dest: 'avatars',
+    // dest: 'avatars',
     limits: {
         fileSize: 1000000
     },
     fileFilter(req, file, cb){
-        if(!file.originalname.match(/\.(doc|docx)$/)){
+        if(!file.originalname.match(/\.(doc|docx|jpg)$/)){
             return cb(new Error("File isn't allowed"))
         }
         cb(undefined, true)
@@ -122,11 +122,26 @@ const upload = multer({
     }
 })
 
-router.post("/users/me/avatar", upload.single('inputFileName'), async (req, res)=>{
+router.post("/users/me/avatar", auth, upload.single('inputFileName'), async (req, res)=>{
+    req.user.avatar = req.file.buffer
+    await req.user.save()
     res.send();
     
 },(error, req, res, next)=>{
     res.status(400).send({error: error.message})
+})
+
+router.get("/user/:id/avatar", async (req, res)=>{
+    try {
+        const user = await User.findById(req.params.id)
+        if(!user || !user.avatar){
+            throw new Error('no avatar')
+        }
+        res.set('Content-Type', 'image/jpg')
+        res.send(user.avatar)
+    } catch (error) {
+        res.status(404).send()
+    }
 })
 
 const middlewareError = (req, res)=>{
