@@ -41,6 +41,8 @@ const userSchema = new mongoose.Schema({
     isSingle: {
         type: Boolean
     }
+},{
+    timestamps: true
 })
 
 userSchema.virtual('tasks', {
