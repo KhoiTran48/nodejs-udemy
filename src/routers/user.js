@@ -2,6 +2,7 @@ const express = require("express")
 const router = new express.Router()
 const User = require("../models/user");
 const auth = require("../middleware/auth")
+const multer = require("multer")
 
 router.post("/user", async (req, res)=>{
     const user = new User(req.body);
@@ -103,6 +104,39 @@ router.post("/users/logoutAll", auth, async (req, res)=>{
     } catch (error) {
         res.status(400).send()
     }
+})
+
+const upload = multer({
+    dest: 'avatars',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb){
+        if(!file.originalname.match(/\.(doc|docx)$/)){
+            return cb(new Error("File isn't allowed"))
+        }
+        cb(undefined, true)
+        // cb(new Error('File must be a PDF'))
+        // cb(undefined, false)
+        // cb(undefined, true)
+    }
+})
+
+router.post("/users/me/avatar", upload.single('inputFileName'), async (req, res)=>{
+    res.send();
+    
+},(error, req, res, next)=>{
+    res.status(400).send({error: error.message})
+})
+
+const middlewareError = (req, res)=>{
+    throw new Error('middleware error')
+}
+
+router.get("/middleware/error", middlewareError, async (req, res)=>{
+    res.send();
+},(error, req, res, next)=>{
+    res.status(400).send({error: error.message})
 })
 
 module.exports = router
