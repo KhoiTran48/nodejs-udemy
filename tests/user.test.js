@@ -65,3 +65,13 @@ test('should get profile for user', async ()=>{
             .expect(200)
     // console.log(res.body)
 })
+
+test('should upload avatar image', async ()=>{
+    await request(app)
+            .post('/users/me/avatar')
+            .set('Authorization', userOne.tokens[0].token)
+            .attach('inputFileName', 'tests/fixtures/eagle.jpg')
+            .expect(200)
+    const user = await User.findById(userOneId)
+    expect(user.avatar).toEqual(expect.any(Buffer))
+})
